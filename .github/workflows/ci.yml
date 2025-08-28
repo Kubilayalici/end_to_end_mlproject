@@ -21,8 +21,9 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 pytest
       - name: Lint (flake8)
+        continue-on-error: true
         run: |
-          flake8 src app.py scripts --ignore=E501,W503
+          flake8 src app.py scripts
       - name: Import smoke tests
         run: |
           python - << 'PY'

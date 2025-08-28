@@ -1,5 +1,4 @@
 [flake8]
 max-line-length = 120
-extend-ignore = E,W,F
-exclude = .git,__pycache__,.venv,venv,env,notebook/*.ipynb
-
+ignore = E203,E266,E501,W503,F401,F841
+exclude = .git,__pycache__,.venv,venv,env,notebook,artifacts
