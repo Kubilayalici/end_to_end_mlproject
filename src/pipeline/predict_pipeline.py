@@ -2,44 +2,13 @@ import sys
 import pandas as pd
 from src.exception import CustomException
 from src.utils import load_object
+from src.features.engineer import engineer_features
 
 
 class PredictPipeline:
     def __init__(self):
         pass
     
-    @staticmethod
-    def _ensure_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
-        """Add engineered features used during training if they are missing.
-        This mirrors the feature engineering done in notebooks before saving cleaned data.
-        """
-        d = df.copy()
-        # Binary flags
-        if 'has_failures' not in d.columns and 'failures' in d.columns:
-            d['has_failures'] = (d['failures'] > 0).astype(int)
-        if 'high_studytime' not in d.columns and 'studytime' in d.columns:
-            d['high_studytime'] = (d['studytime'] >= 3).astype(int)
-        if 'avg_parent_edu' not in d.columns and {'Medu','Fedu'}.issubset(d.columns):
-            d['avg_parent_edu'] = (d['Medu'] + d['Fedu']) / 2.0
-        if 'early_failure' not in d.columns and 'G1' in d.columns:
-            d['early_failure'] = (d['G1'] < 5).astype(int)
-        if 'parents_together' not in d.columns and 'Pstatus' in d.columns:
-            d['parents_together'] = (d['Pstatus'] == 'T').astype(int)
-        if 'big_family' not in d.columns and 'famsize' in d.columns:
-            d['big_family'] = (d['famsize'] == 'GT3').astype(int)
-        if 'urban_student' not in d.columns and 'address' in d.columns:
-            d['urban_student'] = (d['address'] == 'U').astype(int)
-        if 'long_travel' not in d.columns and 'traveltime' in d.columns:
-            d['long_travel'] = (d['traveltime'] >= 3).astype(int)
-        if 'has_internet' not in d.columns and 'internet' in d.columns:
-            d['has_internet'] = (d['internet'] == 'yes').astype(int)
-        if 'romantic_rel' not in d.columns and 'romantic' in d.columns:
-            d['romantic_rel'] = (d['romantic'] == 'yes').astype(int)
-        if 'high_alcohol_use' not in d.columns and {'Dalc','Walc'}.issubset(d.columns):
-            d['high_alcohol_use'] = ((d['Dalc'] + d['Walc']) >= 6).astype(int)
-        if 'high_absenteeism' not in d.columns and 'absences' in d.columns:
-            d['high_absenteeism'] = (d['absences'] >= 10).astype(int)
-        return d
 
     def predict(self, features):
         try:
@@ -48,7 +17,7 @@ class PredictPipeline:
             model = load_object(file_path=model_path)
             preprocessor = load_object(file_path=preprocessor_path)
             # Add engineered features expected by the preprocessor/model
-            features_fe = self._ensure_engineered_features(features)
+            features_fe = engineer_features(features)
             data_scaled = preprocessor.transform(features_fe)
             preds = model.predict(data_scaled)
             return preds

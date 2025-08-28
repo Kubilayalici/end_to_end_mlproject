@@ -1,6 +1,12 @@
 import os
 import dill
 import json
+import argparse
+from sklearn.model_selection import KFold, cross_validate
+try:
+    from src.features.engineer import engineer_features
+except Exception:
+    engineer_features = None
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -40,7 +46,13 @@ def load_cleaned_dataframe() -> pd.DataFrame:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cv", action="store_true", help="Run KFold CV in addition to holdout")
+    args = parser.parse_args()
+
     df = load_cleaned_dataframe()
+    if engineer_features is not None:
+        df = engineer_features(df)
 
     target = 'G3'
     drop_cols = [c for c in ['Total_Score', 'Average_Score'] if c in df.columns]
@@ -124,6 +136,13 @@ def main() -> None:
         mae = mean_absolute_error(y_te, y_pred)
         rows.append({'Model': name, 'R2': r2, 'RMSE': rmse, 'MAE': mae})
         trained[name] = pipe
+
+        if args.cv:
+            cv = KFold(n_splits=5, shuffle=True, random_state=42)
+            cv_scores = cross_validate(pipe, X_tr, y_tr, scoring=("r2", "neg_root_mean_squared_error"), cv=cv, n_jobs=-1)
+            mean_r2 = float(np.mean(cv_scores['test_r2']))
+            mean_rmse = float(-np.mean(cv_scores['test_neg_root_mean_squared_error']))
+            print(f"CV [{name}] R2: {mean_r2:.3f} | RMSE: {mean_rmse:.3f}")
 
     results_df = pd.DataFrame(rows).sort_values('R2', ascending=False)
     print('\nModel comparison (target=G3):')

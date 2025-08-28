@@ -118,11 +118,17 @@ async def post_predict(
 
     pred_df = data.to_dataframe()
     predict_pipeline = PredictPipeline()
-    results = predict_pipeline.predict(pred_df)
-    return templates.TemplateResponse(
-        "home.html",
-        {"request": request, "results": float(results[0]), "model_name": _model_name_or_unknown(), "metrics": _load_metrics()},
-    )
+    try:
+        results = predict_pipeline.predict(pred_df)
+        return templates.TemplateResponse(
+            "home.html",
+            {"request": request, "results": float(results[0]), "model_name": _model_name_or_unknown(), "metrics": _load_metrics(), "error": None},
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "home.html",
+            {"request": request, "results": None, "model_name": _model_name_or_unknown(), "metrics": _load_metrics(), "error": str(e)},
+        )
 
 
 @app.get("/metrics")

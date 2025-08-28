@@ -155,6 +155,9 @@
 
       <aside class="bg-white shadow rounded-xl p-6">
         <h2 class="text-xl font-semibold mb-4">Prediction</h2>
+        {% if error %}
+          <div class="mb-3 rounded bg-red-50 text-red-700 px-3 py-2 text-sm">{{ error }}</div>
+        {% endif %}
         {% if results is not none %}
           <div class="text-4xl font-bold text-blue-700">{{ '%.2f'|format(results) }}</div>
           <p class="text-slate-500 mt-2">Estimated final grade out of 20.</p>
