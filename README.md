@@ -1,4 +1,4 @@
-
+﻿
 # 🎯 Student Exam Performance Prediction
 
 Bu proje, öğrenciye ait sosyo-demografik özellikler ve önceki notlarına dayanarak **G3 (final notu)** değerini tahmin eden uçtan uca bir makine öğrenmesi uygulamasıdır.
@@ -60,6 +60,12 @@ cd end_to_end_mlproject
 pip install -r requirements.txt
 python app.py
 ```
+
+## Calistirma (Run)
+
+- Gelistirme:  `python app.py` 
+- Uretim (Gunicorn):  `gunicorn -b 0.0.0.0:8000 app:app` 
+  - Alternatif WSGI hedefi:  `gunicorn -b 0.0.0.0:8000 app:application` 
 
 ## 👨‍💻 Geliştirici
 

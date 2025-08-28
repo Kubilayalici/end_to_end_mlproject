@@ -8,3 +8,7 @@ xgboost
 dill
 Flask
 #-e .
+fastapi
+uvicorn
+jinja2
+python-multipart
