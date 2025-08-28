@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
 from src.pipeline.predict_pipeline import CustomData, PredictPipeline
 from src.utils import load_object
 import os
@@ -22,6 +23,15 @@ def _model_name_or_unknown() -> str:
     except Exception:
         return "Unknown"
 
+
+def _load_metrics() -> dict:
+    try:
+        import json
+        with open("artifacts/metrics.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
 @app.get("/health", response_class=HTMLResponse)
 async def health() -> str:
     return "OK"
@@ -29,7 +39,10 @@ async def health() -> str:
 
 @app.get("/", response_class=HTMLResponse)
 async def get_home(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request, "results": None, "model_name": _model_name_or_unknown()})
+    return templates.TemplateResponse(
+        "home.html",
+        {"request": request, "results": None, "model_name": _model_name_or_unknown(), "metrics": _load_metrics()},
+    )
 
 
 @app.post("/predict", response_class=HTMLResponse, name="predict")
@@ -106,7 +119,15 @@ async def post_predict(
     pred_df = data.to_dataframe()
     predict_pipeline = PredictPipeline()
     results = predict_pipeline.predict(pred_df)
-    return templates.TemplateResponse("home.html", {"request": request, "results": float(results[0]), "model_name": _model_name_or_unknown()})
+    return templates.TemplateResponse(
+        "home.html",
+        {"request": request, "results": float(results[0]), "model_name": _model_name_or_unknown(), "metrics": _load_metrics()},
+    )
+
+
+@app.get("/metrics")
+async def get_metrics():
+    return JSONResponse(_load_metrics())
 
 
 # For local run: uvicorn app:app --reload

@@ -1,5 +1,6 @@
 import os
 import dill
+import json
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -84,17 +85,18 @@ def main() -> None:
         # Small GridSearch for RF, XGB, CatBoost
         if name == 'Random_Forest':
             param_grid = {
-                'model__n_estimators': [200, 400],
-                'model__max_depth': [None, 10, 20],
-                'model__min_samples_split': [2, 5],
-                'model__min_samples_leaf': [1, 2]
+                'model__n_estimators': [300, 600],
+                'model__max_depth': [None, 10, 20, 30],
+                'model__min_samples_split': [2, 5, 10],
+                'model__min_samples_leaf': [1, 2, 4],
+                'model__max_features': ['sqrt', 'log2']
             }
             gs = GridSearchCV(pipe, param_grid=param_grid, cv=3, scoring='r2', n_jobs=-1, verbose=0)
             gs.fit(X_tr, y_tr)
             pipe = gs.best_estimator_
         elif name == 'XGBRegressor' and XGBRegressor is not None:
             param_grid = {
-                'model__n_estimators': [300, 500],
+                'model__n_estimators': [300, 600],
                 'model__max_depth': [3, 5],
                 'model__learning_rate': [0.05, 0.1],
                 'model__subsample': [0.8, 1.0],
@@ -170,6 +172,22 @@ def main() -> None:
         print("\nSaved artifacts/preprocessor.pkl and artifacts/model.pkl")
     except Exception as e:
         print('Saving model/preprocessor failed:', e)
+
+    # Save metrics for UI
+    try:
+        # Find the row for best_name
+        row = next((r for r in rows if r['Model'] == best_name), None)
+        metrics = {
+            'model': best_name,
+            'R2': row['R2'] if row else None,
+            'RMSE': row['RMSE'] if row else None,
+            'MAE': row['MAE'] if row else None,
+        }
+        with open('artifacts/metrics.json', 'w', encoding='utf-8') as f:
+            json.dump(metrics, f, ensure_ascii=False, indent=2)
+        print("Saved artifacts/metrics.json")
+    except Exception as e:
+        print('Saving metrics failed:', e)
 
 
 if __name__ == '__main__':
