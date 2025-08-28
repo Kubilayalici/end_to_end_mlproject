@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+from pathlib import Path
 from src.exception import CustomException
 from src.utils import load_object
 from src.features.engineer import engineer_features
@@ -12,8 +13,8 @@ class PredictPipeline:
 
     def predict(self, features):
         try:
-            model_path = "artifacts\model.pkl"
-            preprocessor_path = "artifacts\preprocessor.pkl"
+            model_path = Path("artifacts") / "model.pkl"
+            preprocessor_path = Path("artifacts") / "preprocessor.pkl"
             model = load_object(file_path=model_path)
             preprocessor = load_object(file_path=preprocessor_path)
             # Add engineered features expected by the preprocessor/model
