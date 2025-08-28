@@ -1,77 +1,76 @@
-﻿
-# 🎯 Student Exam Performance Prediction
+# Student Exam Performance Prediction
 
-Bu proje, öğrenciye ait sosyo-demografik özellikler ve önceki notlarına dayanarak **G3 (final notu)** değerini tahmin eden uçtan uca bir makine öğrenmesi uygulamasıdır.
+Bu proje, ogrenciye ait sosyo-demografik bilgiler ve onceki notlara dayanarak G3 (final notu) tahmini yapan uctan uca bir makine ogrenmesi uygulamasidir.
 
-## 🔍 Proje Amacı
+## Amac
 
-Öğrenci başarı verileri kullanılarak regresyon modelleriyle son dönem (G3) notunun tahmin edilmesi hedeflenmiştir. Modelleme süreci kapsamında veri ön işleme, özellik mühendisliği, modelleme, değerlendirme ve Flask ile web arayüzü geliştirilmiştir.
+Regresyon ile G3 tahmini: veri on isleme, ozellik muhendisligi, model egitimi/degerlendirmesi ve modern bir web arayuzu ile sunum.
 
-## 📊 Kullanılan Veriler
+## Veri
 
-Veri seti öğrencilere ait şu bilgileri içermektedir:
+- Demografik: cinsiyet, yas, adres, aile durumu vb.
+- Akademik: G1, G2, aktiviteler, calisma suresi vb.
+- Hedef: G3 (final notu)
 
-- Demografik Bilgiler: cinsiyet, yaş, adres, aile durumu vb.
-- Akademik Bilgiler: önceki notlar (G1, G2), ders dışı aktiviteler, öğrenim süresi vb.
-- Hedef Değişken: **G3 (final notu)**
+## Modeller
 
-## ⚙️ Kullanılan Modeller
+- Linear Regression, Ridge, Lasso, KNN
+- Decision Tree, Random Forest, (ops.) XGBoost, CatBoost, AdaBoost
 
-- Linear Regression
-- Ridge, Lasso
-- Decision Tree, Random Forest, XGBoost, CatBoost, AdaBoost
-- KNN Regressor
-
-## ✅ En Başarılı Model
+## En Basarili Model
 
 ```
-XGBoostRegressor: Train R2: 0.9791, Test R2: 0.8007
+RandomForestRegressor (tuned)
+Test R2: ~0.799
+Test RMSE: ~2.03
 ```
 
-## 🌐 Web Uygulaması (Flask)
+## Web Uygulamasi (FastAPI)
 
-Form üzerinden öğrenci bilgileri girildiğinde **matematik notu (G3)** tahmin edilmektedir.
+Form uzerinden girilen ogrenci bilgileri ile G3 tahmini yapar. Uygulama FastAPI + Uvicorn ile calisir; arayuz Tailwind tabanlidir.
 
-### Kullanılan Teknolojiler
+### Teknolojiler
 
 - Python
-- Flask
-- Scikit-learn, XGBoost, CatBoost
-- HTML/CSS (Bootstrap)
+- FastAPI, Uvicorn
+- Scikit-learn (ops.: XGBoost, CatBoost)
+- Tailwind CSS (CDN)
 - Logging, Exception Handling
-- Pipeline ve Model Persistency (joblib/pickle)
+- Pipeline & Model Persistency (dill)
 
-## 📷 Uygulama Görseli
+## Uygulama Goruntusu
 
-![GIF Demo](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGgybGhhbHFmbXZ2dzRreXAzMWxjOXE2aGRoM3poZTZzOHJ2dDVqdiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Yl5aO3gdVfsQ0/giphy.gif)
+![App Screenshot](static/app_screenshot.svg)
 
-## 🧠 Nasıl Çalışır?
+Not: Kendi ekran goruntunuzu `static/app_screenshot.png` olarak kaydedip README'de bu dosyayi referans verebilirsiniz.
 
-1. Veriyi kullanıcıdan HTML formu ile alır.
-2. Preprocessing pipeline ile veriyi işler.
-3. Eğitilmiş modeli kullanarak tahmin yapar.
-4. Tahmini kullanıcıya sunar.
+## Nasil Calisir?
 
-## 🚀 Kurulum
+1. Formdan veriyi alir.
+2. Preprocessor ile donusturur (ColumnTransformer + OneHot/Scale).
+3. Egitilmis modelle tahmin yapar.
+4. Sonucu arayuzde gosterir.
+
+## Kurulum
 
 ```bash
 git clone https://github.com/Kubilayalici/end_to_end_mlproject.git
 cd end_to_end_mlproject
 pip install -r requirements.txt
-python app.py
+python -m uvicorn app:app --reload
 ```
 
 ## Calistirma (Run)
 
-- Gelistirme:  `python app.py` 
-- Uretim (Gunicorn):  `gunicorn -b 0.0.0.0:8000 app:app` 
-  - Alternatif WSGI hedefi:  `gunicorn -b 0.0.0.0:8000 app:application` 
+- Gelistirme: `python -m uvicorn app:app --reload`
+- Docker (yerel): `docker compose up --build`
 
-## 👨‍💻 Geliştirici
+## Gelistirici
 
 **Kubilay ALICI**  
 [GitHub](https://github.com/Kubilayalici) | [LinkedIn](https://www.linkedin.com/in/kubilay-alici-8822a21b9/)
 
 ---
 
-📌 Bu proje, veri bilimi yeteneklerinizi sergilemek ve model geliştirme süreçlerini uçtan uca anlamak için güçlü bir örnektir.
+Bu proje, veri bilimi yeteneklerinizi sergilemek ve model gelistirme sureclerini uctan uca anlamak icin guclu bir ornektir.
+
